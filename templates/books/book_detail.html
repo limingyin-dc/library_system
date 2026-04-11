@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}{{ book.title }}{% endblock %}
+{% block content %}
+<div class="mb-3"><a href="{% url 'book_list' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left"></i> 返回</a></div>
+<div class="card mb-3">
+    <div class="card-header"><h6 class="mb-0">{{ book.title }}</h6></div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong>作者：</strong>{{ book.author }}</p>
+                <p><strong>出版社：</strong>{{ book.publisher }}</p>
+                <p><strong>ISBN：</strong>{{ book.isbn }}</p>
+                <p><strong>分类：</strong>{{ book.category|default:'-' }}</p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>出版日期：</strong>{{ book.publish_date|default:'-' }}</p>
+                <p><strong>总副本数：</strong>{{ book.total_copies }}</p>
+                <p><strong>可借副本数：</strong>{{ book.available_copies }}</p>
+                <p><strong>状态：</strong>{% if book.status == 'available' %}<span class="badge bg-success">可借</span>{% else %}<span class="badge bg-secondary">不可借</span>{% endif %}</p>
+            </div>
+        </div>
+        {% if book.description %}<p><strong>简介：</strong>{{ book.description }}</p>{% endif %}
+    </div>
+</div>
+<h6>副本列表</h6>
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr><th>条形码</th><th>馆藏位置</th><th>状态</th><th>编目时间</th></tr>
+            </thead>
+            <tbody>
+            {% for copy in copies %}
+            <tr>
+                <td>{{ copy.barcode }}</td>
+                <td>{{ copy.location|default:'-' }}</td>
+                <td>{{ copy.get_status_display }}</td>
+                <td>{{ copy.cataloged_at|date:'Y-m-d' }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="text-center text-muted">暂无副本</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

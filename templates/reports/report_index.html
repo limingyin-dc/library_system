@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% block title %}统计报表{% endblock %}
+{% block content %}
+<h5 class="mb-4">统计报表</h5>
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card text-center p-3">
+            <div class="text-muted small">图书总数</div>
+            <div class="fs-2 fw-bold text-primary">{{ total_books }}</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center p-3">
+            <div class="text-muted small">读者总数</div>
+            <div class="fs-2 fw-bold text-success">{{ total_readers }}</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center p-3">
+            <div class="text-muted small">借阅总次数</div>
+            <div class="fs-2 fw-bold text-warning">{{ total_borrows }}</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center p-3">
+            <div class="text-muted small">逾期未还</div>
+            <div class="fs-2 fw-bold text-danger">{{ overdue_borrows }}</div>
+        </div>
+    </div>
+</div>
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">各分类图书数量</div>
+            <div class="card-body"><canvas id="categoryChart" height="200"></canvas></div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">近12个月借阅趋势</div>
+            <div class="card-body"><canvas id="borrowChart" height="200"></canvas></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+const categoryLabels = {{ category_labels|safe }};
+const categoryCounts = {{ category_counts|safe }};
+new Chart(document.getElementById('categoryChart'), {
+    type: 'bar',
+    data: {
+        labels: categoryLabels,
+        datasets: [{
+            label: '图书数量',
+            data: categoryCounts,
+            backgroundColor: 'rgba(52, 152, 219, 0.7)',
+        }]
+    },
+    options: { responsive: true, plugins: { legend: { display: false } } }
+});
+
+const borrowMonths = {{ borrow_months|safe }};
+const borrowCounts = {{ borrow_counts|safe }};
+new Chart(document.getElementById('borrowChart'), {
+    type: 'line',
+    data: {
+        labels: borrowMonths,
+        datasets: [{
+            label: '借阅次数',
+            data: borrowCounts,
+            borderColor: 'rgba(46, 204, 113, 1)',
+            backgroundColor: 'rgba(46, 204, 113, 0.1)',
+            fill: true,
+            tension: 0.3,
+        }]
+    },
+    options: { responsive: true }
+});
+</script>
+{% endblock %}

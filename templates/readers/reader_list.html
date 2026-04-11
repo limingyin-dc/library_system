@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}读者管理{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h5>读者管理</h5>
+    <a href="{% url 'reader_create' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus"></i> 新增读者</a>
+</div>
+<div class="card mb-3">
+    <div class="card-body py-2">
+        <form method="get" class="row g-2">
+            <div class="col-md-4">
+                <input type="text" name="q" value="{{ q }}" class="form-control form-control-sm" placeholder="搜索姓名/借书证号">
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-sm btn-outline-primary">搜索</button>
+                <a href="{% url 'reader_list' %}" class="btn btn-sm btn-outline-secondary">重置</a>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr><th>姓名</th><th>借书证号</th><th>电话</th><th>在借数量</th><th>状态</th><th>操作</th></tr>
+            </thead>
+            <tbody>
+            {% for reader in page_obj %}
+            <tr>
+                <td><a href="{% url 'reader_detail' reader.pk %}">{{ reader.name }}</a></td>
+                <td>{{ reader.card_no }}</td>
+                <td>{{ reader.phone|default:'-' }}</td>
+                <td>{{ reader.current_borrow_count }}/{{ reader.max_borrow }}</td>
+                <td>{% if reader.status == 'active' %}<span class="badge bg-success">正常</span>{% else %}<span class="badge bg-danger">挂起</span>{% endif %}</td>
+                <td>
+                    <a href="{% url 'reader_edit' reader.pk %}" class="btn btn-sm btn-outline-primary">编辑</a>
+                    <a href="{% url 'reader_delete' reader.pk %}" class="btn btn-sm btn-outline-danger">删除</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" class="text-center text-muted">暂无数据</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% if page_obj.has_other_pages %}
+    <div class="card-footer">
+        <nav><ul class="pagination pagination-sm mb-0">
+            {% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}&q={{ q }}">上一页</a></li>{% endif %}
+            <li class="page-item disabled"><a class="page-link">{{ page_obj.number }}/{{ page_obj.paginator.num_pages }}</a></li>
+            {% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}&q={{ q }}">下一页</a></li>{% endif %}
+        </ul></nav>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

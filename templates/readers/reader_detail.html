@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}{{ reader.name }}{% endblock %}
+{% block content %}
+<div class="mb-3"><a href="{% url 'reader_list' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-left"></i> 返回</a></div>
+<div class="card mb-3">
+    <div class="card-header"><h6 class="mb-0">读者信息 - {{ reader.name }}</h6></div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong>借书证号：</strong>{{ reader.card_no }}</p>
+                <p><strong>电话：</strong>{{ reader.phone|default:'-' }}</p>
+                <p><strong>邮箱：</strong>{{ reader.email|default:'-' }}</p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>地址：</strong>{{ reader.address|default:'-' }}</p>
+                <p><strong>最大借阅数：</strong>{{ reader.max_borrow }}</p>
+                <p><strong>状态：</strong>{% if reader.status == 'active' %}<span class="badge bg-success">正常</span>{% else %}<span class="badge bg-danger">挂起</span>{% endif %}</p>
+            </div>
+        </div>
+    </div>
+</div>
+<h6>借阅记录</h6>
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr><th>书名</th><th>借阅日期</th><th>应还日期</th><th>归还日期</th><th>状态</th><th>罚金</th></tr>
+            </thead>
+            <tbody>
+            {% for b in borrows %}
+            <tr>
+                <td>{{ b.book_copy.book.title }}</td>
+                <td>{{ b.borrow_date }}</td>
+                <td>{{ b.due_date }}</td>
+                <td>{{ b.return_date|default:'-' }}</td>
+                <td>{{ b.get_status_display }}</td>
+                <td>{{ b.fine }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" class="text-center text-muted">暂无借阅记录</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

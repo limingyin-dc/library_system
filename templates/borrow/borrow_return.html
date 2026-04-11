@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}还书确认{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="card">
+            <div class="card-header"><h6 class="mb-0">还书确认</h6></div>
+            <div class="card-body">
+                <p><strong>读者：</strong>{{ record.reader.name }}</p>
+                <p><strong>书名：</strong>{{ record.book_copy.book.title }}</p>
+                <p><strong>借阅日期：</strong>{{ record.borrow_date }}</p>
+                <p><strong>应还日期：</strong>{{ record.due_date }}</p>
+                {% if record.is_overdue %}
+                <div class="alert alert-warning">
+                    已逾期，预计罚金：<strong>{{ record.calc_fine }} 元</strong>
+                </div>
+                {% endif %}
+                <form method="post" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success me-2">确认归还</button>
+                </form>
+                <a href="{% url 'borrow_list' %}" class="btn btn-secondary">取消</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

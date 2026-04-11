@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}审批借书申请{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h5>审批借书申请</h5>
+    <a href="{% url 'borrow_request_list' %}" class="btn btn-sm btn-outline-secondary">返回</a>
+</div>
+<div class="card">
+    <div class="card-body">
+        <p><strong>读者：</strong>{{ req.reader.name }}（{{ req.reader.card_no }}）</p>
+        <p><strong>申请图书：</strong>{{ req.book.title }}</p>
+        <p><strong>可借副本：</strong>{{ req.book.available_copies }} 本</p>
+        <p><strong>申请日期：</strong>{{ req.request_date }}</p>
+        <hr>
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label">拒绝原因（拒绝时填写）</label>
+                <input type="text" name="reject_reason" class="form-control" placeholder="可选">
+            </div>
+            <button name="action" value="approve" class="btn btn-success me-2">批准</button>
+            <button name="action" value="reject" class="btn btn-danger">拒绝</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

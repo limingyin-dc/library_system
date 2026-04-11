@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% block title %}首页 - 图书管理系统{% endblock %}
+{% block content %}
+<h5 class="mb-4">系统概览</h5>
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card stat-card" style="border-color:#3498db">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="text-muted small">图书总数</div>
+                        <div class="fs-3 fw-bold text-primary">{{ book_count }}</div>
+                    </div>
+                    <i class="bi bi-journals fs-1 text-primary opacity-25"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card" style="border-color:#2ecc71">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="text-muted small">读者总数</div>
+                        <div class="fs-3 fw-bold text-success">{{ reader_count }}</div>
+                    </div>
+                    <i class="bi bi-people fs-1 text-success opacity-25"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card" style="border-color:#e67e22">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="text-muted small">在借数量</div>
+                        <div class="fs-3 fw-bold text-warning">{{ borrow_count }}</div>
+                    </div>
+                    <i class="bi bi-arrow-left-right fs-1 text-warning opacity-25"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card" style="border-color:#e74c3c">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="text-muted small">待处理采购</div>
+                        <div class="fs-3 fw-bold text-danger">{{ purchase_count }}</div>
+                    </div>
+                    <i class="bi bi-cart fs-1 text-danger opacity-25"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row g-3">
+    {% if user.role == 'admin' or user.role == 'librarian' %}
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center p-4">
+                <i class="bi bi-journals fs-1 text-primary mb-2"></i>
+                <h6>图书管理</h6>
+                <a href="{% url 'book_list' %}" class="btn btn-sm btn-outline-primary mt-2">进入</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center p-4">
+                <i class="bi bi-arrow-left-right fs-1 text-warning mb-2"></i>
+                <h6>借阅管理</h6>
+                <a href="{% url 'borrow_list' %}" class="btn btn-sm btn-outline-warning mt-2">进入</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center p-4">
+                <i class="bi bi-bar-chart fs-1 text-success mb-2"></i>
+                <h6>统计报表</h6>
+                <a href="{% url 'report_index' %}" class="btn btn-sm btn-outline-success mt-2">进入</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% if user.role == 'reader' %}
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center p-4">
+                <i class="bi bi-book fs-1 text-primary mb-2"></i>
+                <h6>我的借阅</h6>
+                <a href="{% url 'my_borrows' %}" class="btn btn-sm btn-outline-primary mt-2">查看</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center p-4">
+                <i class="bi bi-plus-circle fs-1 text-success mb-2"></i>
+                <h6>申请借书</h6>
+                <a href="{% url 'borrow_request_create' %}" class="btn btn-sm btn-outline-success mt-2">去借书</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
