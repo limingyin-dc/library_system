@@ -7,9 +7,10 @@ class PurchaseOrder(models.Model):
         ('pending', '待处理'),
         ('ordered', '已订购'),
         ('received', '已入库'),
+        ('rejected', '不合格/退货'),
         ('cancelled', '已取消'),
     ]
-    book = models.ForeignKey(Book, on_delete=models.SET_NULL, null=True, verbose_name='图书')
+    book = models.ForeignKey(Book, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='关联图书（到货后填写）')
     book_title = models.CharField('书名', max_length=200)
     quantity = models.IntegerField('采购数量', default=1)
     supplier = models.CharField('供应商', max_length=100, blank=True)

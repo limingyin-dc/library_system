@@ -2,7 +2,7 @@
 {% block title %}{{ title }}{% endblock %}
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-7">
+    <div class="col-md-8">
         <div class="card">
             <div class="card-header"><h6 class="mb-0">{{ title }}</h6></div>
             <div class="card-body">
@@ -11,13 +11,18 @@
                     <div class="row">
                     {% for field in form %}
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">{{ field.label }}</label>
+                        <label class="form-label">{{ field.label }}{% if field.field.required %} <span class="text-danger">*</span>{% endif %}</label>
                         {{ field }}
+                        {% if field.help_text %}<div class="form-text text-muted small">{{ field.help_text }}</div>{% endif %}
                         {% if field.errors %}<div class="text-danger small">{{ field.errors }}</div>{% endif %}
                     </div>
                     {% endfor %}
                     </div>
-                    <div class="d-flex gap-2">
+                    <div class="alert alert-info small py-2">
+                        <i class="bi bi-info-circle"></i>
+                        采购时只需填写书名，图书到货并通过质检后再关联图书档案并更新状态为"已入库"；若图书不合格需退货，请将状态改为"不合格/退货"。
+                    </div>
+                    <div class="d-flex gap-2 mt-2">
                         <button type="submit" class="btn btn-primary">保存</button>
                         <a href="{% url 'purchase_list' %}" class="btn btn-secondary">取消</a>
                     </div>
