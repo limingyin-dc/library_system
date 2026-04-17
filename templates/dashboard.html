@@ -1,110 +1,164 @@
 {% extends 'base.html' %}
-{% block title %}首页 - 图书管理系统{% endblock %}
+{% block title %}首页 - 司马迁图书馆{% endblock %}
 {% block content %}
-<h5 class="mb-4">系统概览</h5>
+
+<!-- 欢迎横幅 -->
+<div class="welcome-banner rounded-3 mb-4 p-4 d-flex align-items-center justify-content-between"
+     style="background: linear-gradient(135deg, #1a1f2e 0%, #3b82f6 100%); color:#fff;">
+    <div>
+        <h4 class="mb-1 fw-bold">欢迎回来，{{ user.get_full_name|default:user.username }} 👋</h4>
+        <p class="mb-0 opacity-75 small">司马迁图书馆管理系统 · {{ user.get_role_display }}</p>
+    </div>
+    <i class="bi bi-book-half" style="font-size:3.5rem; opacity:.2;"></i>
+</div>
+
+<!-- 统计卡片 -->
+{% if user.role == 'admin' or user.role == 'librarian' %}
 <div class="row g-3 mb-4">
-    <div class="col-md-3">
-        <div class="card stat-card" style="border-color:#3498db">
+    <div class="col-6 col-md-3">
+        <div class="card stat-card h-100" style="border-color:#3b82f6">
             <div class="card-body">
-                <div class="d-flex justify-content-between">
+                <div class="d-flex justify-content-between align-items-start">
                     <div>
-                        <div class="text-muted small">图书总数</div>
-                        <div class="fs-3 fw-bold text-primary">{{ book_count }}</div>
+                        <div class="text-muted small mb-1">图书总数</div>
+                        <div class="fs-2 fw-bold text-primary">{{ book_count }}</div>
                     </div>
-                    <i class="bi bi-journals fs-1 text-primary opacity-25"></i>
+                    <div class="rounded-circle d-flex align-items-center justify-content-center"
+                         style="width:44px;height:44px;background:#eff6ff">
+                        <i class="bi bi-journals text-primary fs-5"></i>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card stat-card" style="border-color:#2ecc71">
+    <div class="col-6 col-md-3">
+        <div class="card stat-card h-100" style="border-color:#10b981">
             <div class="card-body">
-                <div class="d-flex justify-content-between">
+                <div class="d-flex justify-content-between align-items-start">
                     <div>
-                        <div class="text-muted small">读者总数</div>
-                        <div class="fs-3 fw-bold text-success">{{ reader_count }}</div>
+                        <div class="text-muted small mb-1">读者总数</div>
+                        <div class="fs-2 fw-bold text-success">{{ reader_count }}</div>
                     </div>
-                    <i class="bi bi-people fs-1 text-success opacity-25"></i>
+                    <div class="rounded-circle d-flex align-items-center justify-content-center"
+                         style="width:44px;height:44px;background:#ecfdf5">
+                        <i class="bi bi-people text-success fs-5"></i>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card stat-card" style="border-color:#e67e22">
+    <div class="col-6 col-md-3">
+        <div class="card stat-card h-100" style="border-color:#f59e0b">
             <div class="card-body">
-                <div class="d-flex justify-content-between">
+                <div class="d-flex justify-content-between align-items-start">
                     <div>
-                        <div class="text-muted small">在借数量</div>
-                        <div class="fs-3 fw-bold text-warning">{{ borrow_count }}</div>
+                        <div class="text-muted small mb-1">在借数量</div>
+                        <div class="fs-2 fw-bold text-warning">{{ borrow_count }}</div>
                     </div>
-                    <i class="bi bi-arrow-left-right fs-1 text-warning opacity-25"></i>
+                    <div class="rounded-circle d-flex align-items-center justify-content-center"
+                         style="width:44px;height:44px;background:#fffbeb">
+                        <i class="bi bi-arrow-left-right text-warning fs-5"></i>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card stat-card" style="border-color:#e74c3c">
+    <div class="col-6 col-md-3">
+        <div class="card stat-card h-100" style="border-color:#ef4444">
             <div class="card-body">
-                <div class="d-flex justify-content-between">
+                <div class="d-flex justify-content-between align-items-start">
                     <div>
-                        <div class="text-muted small">待处理采购</div>
-                        <div class="fs-3 fw-bold text-danger">{{ purchase_count }}</div>
+                        <div class="text-muted small mb-1">待处理采购</div>
+                        <div class="fs-2 fw-bold text-danger">{{ purchase_count }}</div>
                     </div>
-                    <i class="bi bi-cart fs-1 text-danger opacity-25"></i>
+                    <div class="rounded-circle d-flex align-items-center justify-content-center"
+                         style="width:44px;height:44px;background:#fef2f2">
+                        <i class="bi bi-cart text-danger fs-5"></i>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- 快捷入口 -->
 <div class="row g-3">
-    {% if user.role == 'admin' or user.role == 'librarian' %}
     <div class="col-md-4">
-        <div class="card h-100">
-            <div class="card-body text-center p-4">
-                <i class="bi bi-journals fs-1 text-primary mb-2"></i>
-                <h6>图书管理</h6>
-                <a href="{% url 'book_list' %}" class="btn btn-sm btn-outline-primary mt-2">进入</a>
+        <a href="{% url 'book_list' %}" class="text-decoration-none">
+            <div class="card shortcut-card h-100">
+                <div class="card-body text-center">
+                    <div class="rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center"
+                         style="width:56px;height:56px;background:#eff6ff">
+                        <i class="bi bi-journals fs-3 text-primary"></i>
+                    </div>
+                    <h6 class="mb-1">图书管理</h6>
+                    <p class="text-muted small mb-0">管理馆藏图书信息</p>
+                </div>
             </div>
-        </div>
+        </a>
     </div>
     <div class="col-md-4">
-        <div class="card h-100">
-            <div class="card-body text-center p-4">
-                <i class="bi bi-arrow-left-right fs-1 text-warning mb-2"></i>
-                <h6>借阅管理</h6>
-                <a href="{% url 'borrow_list' %}" class="btn btn-sm btn-outline-warning mt-2">进入</a>
+        <a href="{% url 'borrow_list' %}" class="text-decoration-none">
+            <div class="card shortcut-card h-100">
+                <div class="card-body text-center">
+                    <div class="rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center"
+                         style="width:56px;height:56px;background:#fffbeb">
+                        <i class="bi bi-arrow-left-right fs-3 text-warning"></i>
+                    </div>
+                    <h6 class="mb-1">借阅管理</h6>
+                    <p class="text-muted small mb-0">借还书登记与逾期处理</p>
+                </div>
             </div>
-        </div>
+        </a>
     </div>
     <div class="col-md-4">
-        <div class="card h-100">
-            <div class="card-body text-center p-4">
-                <i class="bi bi-bar-chart fs-1 text-success mb-2"></i>
-                <h6>统计报表</h6>
-                <a href="{% url 'report_index' %}" class="btn btn-sm btn-outline-success mt-2">进入</a>
+        <a href="{% url 'report_index' %}" class="text-decoration-none">
+            <div class="card shortcut-card h-100">
+                <div class="card-body text-center">
+                    <div class="rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center"
+                         style="width:56px;height:56px;background:#ecfdf5">
+                        <i class="bi bi-bar-chart fs-3 text-success"></i>
+                    </div>
+                    <h6 class="mb-1">统计报表</h6>
+                    <p class="text-muted small mb-0">查看借阅与采购统计</p>
+                </div>
             </div>
-        </div>
+        </a>
     </div>
-    {% endif %}
-    {% if user.role == 'reader' %}
-    <div class="col-md-4">
-        <div class="card h-100">
-            <div class="card-body text-center p-4">
-                <i class="bi bi-book fs-1 text-primary mb-2"></i>
-                <h6>我的借阅</h6>
-                <a href="{% url 'my_borrows' %}" class="btn btn-sm btn-outline-primary mt-2">查看</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card h-100">
-            <div class="card-body text-center p-4">
-                <i class="bi bi-plus-circle fs-1 text-success mb-2"></i>
-                <h6>申请借书</h6>
-                <a href="{% url 'borrow_request_create' %}" class="btn btn-sm btn-outline-success mt-2">去借书</a>
-            </div>
-        </div>
-    </div>
-    {% endif %}
 </div>
+{% endif %}
+
+{% if user.role == 'reader' %}
+<div class="row g-3">
+    <div class="col-md-4">
+        <a href="{% url 'my_borrows' %}" class="text-decoration-none">
+            <div class="card shortcut-card h-100">
+                <div class="card-body text-center">
+                    <div class="rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center"
+                         style="width:56px;height:56px;background:#eff6ff">
+                        <i class="bi bi-book fs-3 text-primary"></i>
+                    </div>
+                    <h6 class="mb-1">我的借阅</h6>
+                    <p class="text-muted small mb-0">查看借阅记录与申请状态</p>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a href="{% url 'borrow_request_create' %}" class="text-decoration-none">
+            <div class="card shortcut-card h-100">
+                <div class="card-body text-center">
+                    <div class="rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center"
+                         style="width:56px;height:56px;background:#ecfdf5">
+                        <i class="bi bi-plus-circle fs-3 text-success"></i>
+                    </div>
+                    <h6 class="mb-1">申请借书</h6>
+                    <p class="text-muted small mb-0">浏览可借图书并提交申请</p>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+{% endif %}
+
 {% endblock %}

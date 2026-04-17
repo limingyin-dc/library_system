@@ -3,28 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}图书管理系统{% endblock %}</title>
+    <title>{% block title %}司马迁图书馆{% endblock %}</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/bootstrap-icons.min.css' %}">
     <style>
-        body { background-color: #f8f9fa; }
-        .sidebar { min-height: 100vh; background: #2c3e50; }
-        .sidebar .nav-link { color: #bdc3c7; padding: 10px 20px; }
-        .sidebar .nav-link:hover, .sidebar .nav-link.active { color: #fff; background: #34495e; }
-        .sidebar .nav-section { color: #7f8c8d; font-size: 0.75rem; padding: 10px 20px 4px; text-transform: uppercase; }
-        .sidebar-brand { color: #fff; font-size: 1.2rem; font-weight: bold; padding: 20px; border-bottom: 1px solid #34495e; }
-        .main-content { padding: 20px; }
-        .card { border: none; box-shadow: 0 1px 4px rgba(0,0,0,.1); }
+        :root {
+            --sidebar-bg: #1a1f2e;
+            --sidebar-hover: #2d3548;
+            --sidebar-active: #3b82f6;
+            --sidebar-text: #94a3b8;
+            --sidebar-text-active: #fff;
+            --topbar-height: 56px;
+        }
+        body {
+            background: url("{% static 'images/background.jpg' %}") center center / cover no-repeat fixed;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 20, 35, 0.55);
+            z-index: 0;
+        }
+        .sidebar, .main-wrapper { position: relative; z-index: 1; }
+
+        /* 侧边栏 */
+        .sidebar {
+            min-height: 100vh;
+            width: 220px;
+            min-width: 220px;
+            background: var(--sidebar-bg);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0; left: 0; bottom: 0;
+            z-index: 100;
+            box-shadow: 2px 0 8px rgba(0,0,0,.15);
+        }
+        .sidebar-brand {
+            color: #fff;
+            font-size: 1.05rem;
+            font-weight: 700;
+            padding: 18px 20px;
+            border-bottom: 1px solid #2d3548;
+            letter-spacing: .5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .sidebar .nav-link {
+            color: var(--sidebar-text);
+            padding: 9px 20px;
+            border-radius: 6px;
+            margin: 1px 8px;
+            font-size: .875rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all .15s;
+        }
+        .sidebar .nav-link:hover { color: var(--sidebar-text-active); background: var(--sidebar-hover); }
+        .sidebar .nav-link.active { color: var(--sidebar-text-active); background: var(--sidebar-active); }
+        .sidebar .nav-section {
+            color: #475569;
+            font-size: .7rem;
+            padding: 12px 20px 4px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* 主区域 */
+        .main-wrapper { margin-left: 220px; min-height: 100vh; display: flex; flex-direction: column; width: calc(100% - 220px); }
+        .topbar {
+            height: var(--topbar-height);
+            background: rgba(255,255,255,0.88);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid rgba(226,232,240,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            position: sticky;
+            top: 0;
+            z-index: 99;
+            box-shadow: 0 1px 4px rgba(0,0,0,.06);
+        }
+        .topbar .user-info { font-size: .875rem; color: #64748b; }
+        .main-content { padding: 24px; flex: 1; }
+
+        /* 卡片 */
+        .card {
+            border: none;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.92);
+            box-shadow: 0 2px 12px rgba(0,0,0,.12);
+            transition: box-shadow .2s, transform .2s;
+        }
+        .card:hover { box-shadow: 0 6px 24px rgba(0,0,0,.18); transform: translateY(-1px); }
         .stat-card { border-left: 4px solid; }
+
+        /* 快捷入口卡片 */
+        .shortcut-card { cursor: pointer; }
+        .shortcut-card .card-body { padding: 28px 16px; }
+        .shortcut-card i { transition: transform .2s; }
+        .shortcut-card:hover i { transform: scale(1.15); }
     </style>
 </head>
 <body>
 {% if user.is_authenticated %}
-<div class="d-flex">
-    <div class="sidebar" style="width:220px; min-width:220px;">
-        <div class="sidebar-brand"><i class="bi bi-book"></i> 图书管理系统</div>
-        <nav class="nav flex-column mt-2">
+<div style="min-height:100vh;">
+    <div class="sidebar">
+        <div class="sidebar-brand"><i class="bi bi-book-half"></i> 司马迁图书馆</div>
+        <nav class="nav flex-column mt-2 flex-grow-1">
             <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}">
                 <i class="bi bi-speedometer2"></i> 首页
             </a>
@@ -51,11 +143,11 @@
             {% endif %}
         </nav>
     </div>
-    <div class="flex-grow-1">
-        <nav class="navbar navbar-light bg-white border-bottom px-3">
-            <span class="navbar-text">欢迎，{{ user.get_full_name|default:user.username }}（{{ user.get_role_display }}）</span>
+    <div class="main-wrapper">
+        <div class="topbar">
+            <span class="user-info"><i class="bi bi-person-circle me-1"></i>{{ user.get_full_name|default:user.username }} <span class="badge bg-secondary ms-1" style="font-size:.7rem">{{ user.get_role_display }}</span></span>
             <a href="{% url 'logout' %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-box-arrow-right"></i> 退出</a>
-        </nav>
+        </div>
         <div class="main-content">
             {% for msg in messages %}
             <div class="alert alert-{{ msg.tags|default:'info' }} alert-dismissible fade show" role="alert">

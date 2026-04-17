@@ -6,7 +6,7 @@
     <div class="table-responsive">
         <table class="table table-hover mb-0">
             <thead class="table-light">
-                <tr><th>读者</th><th>书名</th><th>申请日期</th><th>操作</th></tr>
+                <tr><th>读者</th><th>书名</th><th>申请日期</th><th>借阅情况</th><th>操作</th></tr>
             </thead>
             <tbody>
             {% for req in requests %}
@@ -14,10 +14,20 @@
                 <td>{{ req.reader.name }}（{{ req.reader.card_no }}）</td>
                 <td>{{ req.book.title }}</td>
                 <td>{{ req.request_date }}</td>
+                <td>
+                    {% with total=req.reader_borrow_count max=req.reader.max_borrow %}
+                    <span class="small {% if total >= max %}text-danger fw-bold{% else %}text-muted{% endif %}">
+                        借阅中 {{ req.reader_borrow_count }} / {{ req.reader.max_borrow }}
+                        {% if req.reader_pending_count > 1 %}
+                        <span class="text-warning">（另有 {{ req.reader_pending_count }} 条待审批）</span>
+                        {% endif %}
+                    </span>
+                    {% endwith %}
+                </td>
                 <td><a href="{% url 'borrow_request_approve' req.pk %}" class="btn btn-sm btn-primary">审批</a></td>
             </tr>
             {% empty %}
-            <tr><td colspan="4" class="text-center text-muted">暂无待审批申请</td></tr>
+            <tr><td colspan="5" class="text-center text-muted">暂无待审批申请</td></tr>
             {% endfor %}
             </tbody>
         </table>

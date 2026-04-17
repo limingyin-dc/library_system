@@ -116,20 +116,30 @@ def borrow_request_create(request):
         messages.error(request, '您还没有关联读者档案，请联系管理员')
         return redirect('dashboard')
     books = Book.objects.filter(status='available', available_copies__gt=0).select_related('category')
+    # 当前借阅中 + 待审批申请数，合计不能超过上限
+    pending_count = BorrowRequest.objects.filter(reader=reader, status='pending').count()
+    current_total = reader.current_borrow_count() + pending_count
     if request.method == 'POST':
         book_id = request.POST.get('book_id')
         book = get_object_or_404(Book, pk=book_id)
+        # 重新计算，防止并发
+        pending_count = BorrowRequest.objects.filter(reader=reader, status='pending').count()
+        current_total = reader.current_borrow_count() + pending_count
         if reader.status == 'suspended':
             messages.error(request, '您的账号已挂起，无法申请借书')
-        elif reader.current_borrow_count() >= reader.max_borrow:
-            messages.error(request, f'您已达最大借阅数量({reader.max_borrow}本)')
+        elif current_total >= reader.max_borrow:
+            messages.error(request, f'您当前借阅+待审批申请已达上限（{reader.max_borrow}本），请还书或等待审批完成后再申请')
         elif BorrowRequest.objects.filter(reader=reader, book=book, status='pending').exists():
             messages.warning(request, '您已申请过该书，请等待审批')
         else:
             BorrowRequest.objects.create(reader=reader, book=book)
             messages.success(request, '借书申请已提交，请等待馆员审批')
             return redirect('my_borrows')
-    return render(request, 'borrow/borrow_request_form.html', {'books': books})
+    return render(request, 'borrow/borrow_request_form.html', {
+        'books': books,
+        'reader': reader,
+        'current_total': current_total,
+    })
 
 
 @login_required
@@ -154,6 +164,10 @@ def borrow_request_list(request):
         messages.error(request, '权限不足')
         return redirect('dashboard')
     qs = BorrowRequest.objects.filter(status='pending').select_related('reader', 'book').order_by('created_at')
+    # 为每条申请附加读者当前借阅数和待审批数，方便馆员判断
+    for req in qs:
+        req.reader_borrow_count = req.reader.current_borrow_count()
+        req.reader_pending_count = BorrowRequest.objects.filter(reader=req.reader, status='pending').count()
     return render(request, 'borrow/borrow_request_list.html', {'requests': qs})
 
 
@@ -170,6 +184,8 @@ def borrow_request_approve(request, pk):
             copy = req.book.bookcopy_set.filter(status='available').first()
             if not copy:
                 messages.error(request, '该书暂无可借副本')
+            elif req.reader.current_borrow_count() >= req.reader.max_borrow:
+                messages.error(request, f'该读者已达最大借阅数量（{req.reader.max_borrow}本），无法批准')
             else:
                 from django.conf import settings
                 from datetime import timedelta

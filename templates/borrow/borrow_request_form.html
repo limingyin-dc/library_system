@@ -5,6 +5,15 @@
     <h5>申请借书</h5>
     <a href="{% url 'my_borrows' %}" class="btn btn-sm btn-outline-secondary">返回</a>
 </div>
+
+<div class="alert {% if current_total >= reader.max_borrow %}alert-danger{% else %}alert-info{% endif %} py-2 small mb-3">
+    <i class="bi bi-info-circle"></i>
+    当前借阅中 + 待审批申请：<strong>{{ current_total }}</strong> / {{ reader.max_borrow }} 本
+    {% if current_total >= reader.max_borrow %}
+    &nbsp;— 已达上限，请还书或等待审批完成后再申请
+    {% endif %}
+</div>
+
 <div class="card">
     <div class="table-responsive">
         <table class="table table-hover mb-0">
@@ -22,7 +31,7 @@
                     <form method="post">
                         {% csrf_token %}
                         <input type="hidden" name="book_id" value="{{ book.pk }}">
-                        <button class="btn btn-sm btn-primary">申请</button>
+                        <button class="btn btn-sm btn-primary" {% if current_total >= reader.max_borrow %}disabled{% endif %}>申请</button>
                     </form>
                 </td>
             </tr>
